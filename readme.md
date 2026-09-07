@@ -4,7 +4,7 @@
   Configuration reviews · Application control · Automated remediation</p>
 </p>
 
-(https://github.com/YOUR-USERNAME/endpoint-hardening-framework/actions/workflows/ci.yml)
+[![CI](https://github.com/ShivamPatel8800/endpoint-hardening-framework/actions/workflows/ci.yml/badge.svg)](https://github.com/ShivamPatel8800/endpoint-hardening-framework/actions/workflows/ci.yml)
 ![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-blue)
 ![Python](https://img.shields.io/badge/python-3.8%2B-green)
 ![Dependencies](https://img.shields.io/badge/dependencies-0-brightgreen)
@@ -290,3 +290,5 @@ baseline entry. Run `pytest` locally before submitting.
 ## License
 
 MIT — see [LICENSE](LICENSE).
+
+Want me to generate a matching `CONTRIBUTING.md` and `SECURITY.md` pair to round out the repo's community health files (GitHub shows them in the sidebar and it's what security-minded reviewers look for)?
