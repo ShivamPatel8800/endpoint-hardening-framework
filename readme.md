@@ -4,7 +4,6 @@
   Configuration reviews · Application control · Automated remediation</p>
 </p>
 
-[![CI](https://github.com/ShivamPatel8800/endpoint-hardening-framework/actions/workflows/ci.yml/badge.svg)](https://github.com/ShivamPatel8800/endpoint-hardening-framework/actions/workflows/ci.yml)
 ![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-blue)
 ![Python](https://img.shields.io/badge/python-3.8%2B-green)
 ![Dependencies](https://img.shields.io/badge/dependencies-0-brightgreen)
@@ -47,7 +46,7 @@ works everywhere and the severity-weighted score is never distorted.
 ## Quick start
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/endpoint-hardening-framework.git
+git clone https://github.com/ShivamPatel8800/endpoint-hardening-framework.git
 cd endpoint-hardening-framework
 python3 -m eshf scan
 ```
