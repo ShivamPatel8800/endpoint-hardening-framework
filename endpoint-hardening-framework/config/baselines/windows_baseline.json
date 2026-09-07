@@ -1,0 +1,222 @@
+{
+  "metadata": {
+    "name": "ESHF Windows Workstation Baseline",
+    "version": "1.0.0",
+    "platform": "windows",
+    "description": "Core hardening checks for Windows 10/11 endpoints (CIS-inspired)."
+  },
+  "checks": [
+    {
+      "id": "ESHF-WIN-0001",
+      "title": "User Account Control (UAC) is enabled",
+      "category": "access-control",
+      "severity": "critical",
+      "type": "registry",
+      "params": {
+        "path": "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
+        "value": "EnableLUA", "operator": "eq", "expected": 1
+      },
+      "remediation": {
+        "type": "registry",
+        "path": "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
+        "value": "EnableLUA", "reg_type": "dword", "data": 1,
+        "description": "Set EnableLUA=1 (reboot required)"
+      }
+    },
+    {
+      "id": "ESHF-WIN-0002",
+      "title": "UAC prompts on the secure desktop for admins",
+      "category": "access-control",
+      "severity": "high",
+      "type": "registry",
+      "params": {
+        "path": "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
+        "value": "ConsentPromptBehaviorAdmin", "operator": "eq", "expected": 2
+      },
+      "remediation": {
+        "type": "registry",
+        "path": "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
+        "value": "ConsentPromptBehaviorAdmin", "reg_type": "dword", "data": 2,
+        "description": "Set ConsentPromptBehaviorAdmin=2 (secure desktop prompt)"
+      }
+    },
+    {
+      "id": "ESHF-WIN-0003",
+      "title": "SMBv1 server protocol is disabled",
+      "category": "network",
+      "severity": "critical",
+      "type": "registry",
+      "params": {
+        "path": "HKLM\\SYSTEM\\CurrentControlSet\\Services\\LanmanServer\\Parameters",
+        "value": "SMB1", "operator": "eq", "expected": 0
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "powershell -Command \"Disable-WindowsOptionalFeature -Online -FeatureName SMB1Protocol -NoRestart\"",
+        "description": "Disable the SMB1Protocol optional feature"
+      }
+    },
+    {
+      "id": "ESHF-WIN-0004",
+      "title": "RDP requires Network Level Authentication",
+      "category": "remote-access",
+      "severity": "high",
+      "type": "registry",
+      "params": {
+        "path": "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Terminal Server\\WinStations\\RDP-Tcp",
+        "value": "UserAuthentication", "operator": "eq", "expected": 1
+      },
+      "remediation": {
+        "type": "registry",
+        "path": "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Terminal Server\\WinStations\\RDP-Tcp",
+        "value": "UserAuthentication", "reg_type": "dword", "data": 1,
+        "description": "Enable NLA for RDP"
+      }
+    },
+    {
+      "id": "ESHF-WIN-0005",
+      "title": "LSA runs as a protected process (RunAsPPL)",
+      "category": "credential-protection",
+      "severity": "high",
+      "type": "registry",
+      "params": {
+        "path": "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Lsa",
+        "value": "RunAsPPL", "operator": "eq", "expected": 1
+      },
+      "remediation": {
+        "type": "registry",
+        "path": "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Lsa",
+        "value": "RunAsPPL", "reg_type": "dword", "data": 1,
+        "description": "Set RunAsPPL=1 (requires UEFI lock for full enforcement)"
+      }
+    },
+    {
+      "id": "ESHF-WIN-0006",
+      "title": "Anonymous SMB enumeration is restricted",
+      "category": "network",
+      "severity": "high",
+      "type": "registry",
+      "params": {
+        "path": "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Lsa",
+        "value": "RestrictAnonymous", "operator": "eq", "expected": 1
+      },
+      "remediation": {
+        "type": "registry",
+        "path": "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Lsa",
+        "value": "RestrictAnonymous", "reg_type": "dword", "data": 1,
+        "description": "Set RestrictAnonymous=1"
+      }
+    },
+    {
+      "id": "ESHF-WIN-0007",
+      "title": "AutoRun/AutoPlay is disabled on all drives",
+      "category": "device-control",
+      "severity": "medium",
+      "type": "registry",
+      "params": {
+        "path": "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
+        "value": "NoDriveTypeAutoRun", "operator": "eq", "expected": 255
+      },
+      "remediation": {
+        "type": "registry",
+        "path": "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
+        "value": "NoDriveTypeAutoRun", "reg_type": "dword", "data": 255,
+        "description": "Set NoDriveTypeAutoRun=255"
+      }
+    },
+    {
+      "id": "ESHF-WIN-0008",
+      "title": "Windows Firewall (domain profile) is enabled",
+      "category": "network",
+      "severity": "high",
+      "type": "registry",
+      "params": {
+        "path": "HKLM\\SOFTWARE\\Policies\\Microsoft\\WindowsFirewall\\DomainProfile",
+        "value": "EnableFirewall", "operator": "eq", "expected": 1
+      },
+      "remediation": {
+        "type": "registry",
+        "path": "HKLM\\SOFTWARE\\Policies\\Microsoft\\WindowsFirewall\\DomainProfile",
+        "value": "EnableFirewall", "reg_type": "dword", "data": 1,
+        "description": "Enable firewall domain profile (policy key)"
+      }
+    },
+    {
+      "id": "ESHF-WIN-0009",
+      "title": "Password-protected screensaver is enforced (current user)",
+      "category": "access-control",
+      "severity": "medium",
+      "type": "registry",
+      "params": {
+        "path": "HKCU\\Software\\Policies\\Microsoft\\Windows\\Control Panel\\Desktop",
+        "value": "ScreenSaverIsSecure", "operator": "eq", "expected": "1"
+      },
+      "remediation": {
+        "type": "registry",
+        "path": "HKCU\\Software\\Policies\\Microsoft\\Windows\\Control Panel\\Desktop",
+        "value": "ScreenSaverIsSecure", "reg_type": "string", "data": "1",
+        "description": "Set ScreenSaverIsSecure=1 for current user"
+      }
+    },
+    {
+      "id": "ESHF-WIN-0010",
+      "title": "RemoteRegistry service is disabled",
+      "category": "services",
+      "severity": "medium",
+      "type": "service",
+      "params": { "name": "RemoteRegistry", "startup": "disabled" },
+      "remediation": {
+        "type": "command",
+        "cmd": "sc config RemoteRegistry start= disabled",
+        "description": "sc config RemoteRegistry start= disabled"
+      }
+    },
+    {
+      "id": "ESHF-WIN-0011",
+      "title": "Minimum password length is at least 8",
+      "category": "password-policy",
+      "severity": "high",
+      "type": "command",
+      "params": {
+        "cmd": "net accounts",
+        "pattern": "Minimum password length\\s*:\\s*(\\d+)",
+        "group": 1, "operator": "ge", "expected": 8
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "net accounts /minpwlen:8",
+        "description": "net accounts /minpwlen:8"
+      }
+    },
+    {
+      "id": "ESHF-WIN-0012",
+      "title": "Maximum password age is 90 days or less",
+      "category": "password-policy",
+      "severity": "medium",
+      "type": "command",
+      "params": {
+        "cmd": "net accounts",
+        "pattern": "Maximum password age\\s*\\(days\\):\\s*(\\d+)",
+        "group": 1, "operator": "le", "expected": 90
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "net accounts /maxpwage:90",
+        "description": "net accounts /maxpwage:90"
+      }
+    },
+    {
+      "id": "ESHF-WIN-0013",
+      "title": "Application control (AppLocker) policy is present and active",
+      "category": "application-control",
+      "severity": "high",
+      "type": "app_control_status",
+      "params": {},
+      "remediation": {
+        "type": "command",
+        "cmd": "eshf appcontrol export --target applocker -o applocker-draft.xml",
+        "description": "Generate a draft AppLocker policy with: eshf appcontrol export"
+      }
+    }
+  ]
+}

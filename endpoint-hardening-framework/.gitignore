@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.eggs/
+
+# Virtualenvs
+.venv/
+venv/
+
+# Test / tooling caches
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Generated reports — don't commit scan output
+report*.html
+*-report.html
+*-report.json
+*-report.csv
+
+# macOS
+.DS_Store
+._*

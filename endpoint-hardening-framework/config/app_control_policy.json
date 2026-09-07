@@ -1,0 +1,41 @@
+{
+  "name": "eshf-default-policy",
+  "version": 3,
+  "default_action": "allow",
+  "rules": [
+    {
+      "id": "R001",
+      "action": "allow",
+      "match": "path",
+      "values": [
+        "C:\\Windows\\*", "C:\\Program Files\\*", "C:\\Program Files (x86)\\*",
+        "/usr/bin/*", "/usr/sbin/*", "/bin/*", "/sbin/*"
+      ],
+      "description": "Trusted OS and program directories"
+    },
+    {
+      "id": "R002",
+      "action": "deny",
+      "match": "path",
+      "values": [
+        "*\\AppData\\Local\\Temp\\*", "*\\Downloads\\*",
+        "*/tmp/*", "*/var/tmp/*"
+      ],
+      "description": "Block execution from user-writable locations"
+    },
+    {
+      "id": "R003",
+      "action": "deny",
+      "match": "extension",
+      "values": [".scr", ".jar", ".hta"],
+      "description": "Block commonly abused formats"
+    },
+    {
+      "id": "R004",
+      "action": "deny",
+      "match": "hash",
+      "values": ["275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f"],
+      "description": "EICAR antivirus test file (safe demo of hash blocking)"
+    }
+  ]
+}

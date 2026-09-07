@@ -1,0 +1,181 @@
+{
+  "metadata": {
+    "name": "ESHF Linux Server Baseline",
+    "version": "1.0.0",
+    "platform": "linux",
+    "description": "Core hardening checks for Linux servers (CIS-inspired)."
+  },
+  "checks": [
+    {
+      "id": "ESHF-LIN-0001",
+      "title": "/etc/passwd is not group/world writable",
+      "category": "file-permissions",
+      "severity": "medium",
+      "type": "file_permission",
+      "params": { "path": "/etc/passwd", "operator": "in", "expected": "0644" },
+      "remediation": { "type": "chmod", "path": "/etc/passwd", "mode": "644",
+                       "description": "chmod 644 /etc/passwd" }
+    },
+    {
+      "id": "ESHF-LIN-0002",
+      "title": "/etc/shadow has restrictive permissions",
+      "category": "file-permissions",
+      "severity": "high",
+      "type": "file_permission",
+      "params": { "path": "/etc/shadow", "operator": "in", "expected": "0640|0600|0000" },
+      "remediation": { "type": "chmod", "path": "/etc/shadow", "mode": "640",
+                       "description": "chmod 640 /etc/shadow (adjust group to 'shadow' per distro)" }
+    },
+    {
+      "id": "ESHF-LIN-0003",
+      "title": "SSH: root login disabled",
+      "category": "ssh",
+      "severity": "critical",
+      "type": "file_content",
+      "params": { "path": "/etc/ssh/sshd_config",
+                  "pattern": "^\\s*PermitRootLogin\\s+no\\s*$", "operator": "present" },
+      "remediation": { "type": "file_line", "path": "/etc/ssh/sshd_config",
+                       "pattern": "^\\s*#?\\s*PermitRootLogin\\s",
+                       "line": "PermitRootLogin no",
+                       "description": "Ensure 'PermitRootLogin no' in sshd_config, then restart sshd" }
+    },
+    {
+      "id": "ESHF-LIN-0004",
+      "title": "SSH: password authentication disabled (key-based only)",
+      "category": "ssh",
+      "severity": "high",
+      "type": "file_content",
+      "params": { "path": "/etc/ssh/sshd_config",
+                  "pattern": "^\\s*PasswordAuthentication\\s+no\\s*$", "operator": "present" },
+      "remediation": { "type": "file_line", "path": "/etc/ssh/sshd_config",
+                       "pattern": "^\\s*#?\\s*PasswordAuthentication\\s",
+                       "line": "PasswordAuthentication no",
+                       "description": "Ensure 'PasswordAuthentication no', then restart sshd" }
+    },
+    {
+      "id": "ESHF-LIN-0005",
+      "title": "SSH: X11 forwarding disabled",
+      "category": "ssh",
+      "severity": "low",
+      "type": "file_content",
+      "params": { "path": "/etc/ssh/sshd_config",
+                  "pattern": "^\\s*X11Forwarding\\s+no\\s*$", "operator": "present" },
+      "remediation": { "type": "file_line", "path": "/etc/ssh/sshd_config",
+                       "pattern": "^\\s*#?\\s*X11Forwarding\\s",
+                       "line": "X11Forwarding no",
+                       "description": "Ensure 'X11Forwarding no', then restart sshd" }
+    },
+    {
+      "id": "ESHF-LIN-0006",
+      "title": "SSH: MaxAuthTries is 4 or fewer",
+      "category": "ssh",
+      "severity": "medium",
+      "type": "file_content",
+      "params": { "path": "/etc/ssh/sshd_config",
+                  "pattern": "^\\s*MaxAuthTries\\s+(\\d+)",
+                  "group": 1, "operator": "le", "expected": 4 },
+      "remediation": { "type": "file_line", "path": "/etc/ssh/sshd_config",
+                       "pattern": "^\\s*#?\\s*MaxAuthTries\\s",
+                       "line": "MaxAuthTries 4",
+                       "description": "Ensure 'MaxAuthTries 4', then restart sshd" }
+    },
+    {
+      "id": "ESHF-LIN-0007",
+      "title": "Password maximum age is 90 days or fewer",
+      "category": "password-policy",
+      "severity": "high",
+      "type": "file_content",
+      "params": { "path": "/etc/login.defs",
+                  "pattern": "^\\s*PASS_MAX_DAYS\\s+(\\d+)",
+                  "group": 1, "operator": "le", "expected": 90 },
+      "remediation": { "type": "file_line", "path": "/etc/login.defs",
+                       "pattern": "^\\s*PASS_MAX_DAYS\\s",
+                       "line": "PASS_MAX_DAYS 90",
+                       "description": "Set PASS_MAX_DAYS 90 in /etc/login.defs" }
+    },
+    {
+      "id": "ESHF-LIN-0008",
+      "title": "pwquality minimum password length is at least 12",
+      "category": "password-policy",
+      "severity": "medium",
+      "type": "file_content",
+      "params": { "path": "/etc/security/pwquality.conf",
+                  "pattern": "^\\s*minlen\\s*=\\s*(\\d+)",
+                  "group": 1, "operator": "ge", "expected": 12 },
+      "remediation": { "type": "file_line", "path": "/etc/security/pwquality.conf",
+                       "pattern": "^\\s*#?\\s*minlen\\s*=",
+                       "line": "minlen = 12",
+                       "description": "Set minlen = 12 in pwquality.conf" }
+    },
+    {
+      "id": "ESHF-LIN-0009",
+      "title": "Telnet server package is not installed",
+      "category": "services",
+      "severity": "medium",
+      "type": "package",
+      "params": { "name": "telnetd", "expected": "absent" },
+      "remediation": { "type": "command", "cmd": "apt-get remove -y telnetd || dnf remove -y telnet-server",
+                       "description": "Remove telnet server (deb: telnetd, rpm: telnet-server)" }
+    },
+    {
+      "id": "ESHF-LIN-0010",
+      "title": "auditd service is active",
+      "category": "logging",
+      "severity": "medium",
+      "type": "service",
+      "params": { "name": "auditd", "state": "active" },
+      "remediation": { "type": "command", "cmd": "systemctl enable --now auditd",
+                       "description": "Enable and start auditd" }
+    },
+    {
+      "id": "ESHF-LIN-0011",
+      "title": "Core dumps for SUID programs are restricted",
+      "category": "kernel",
+      "severity": "medium",
+      "type": "sysctl",
+      "params": { "key": "fs.suid_dumpable", "operator": "eq", "expected": 0 },
+      "remediation": { "type": "sysctl", "key": "fs.suid_dumpable", "value": 0,
+                       "description": "Set fs.suid_dumpable=0 (runtime + persistent)" }
+    },
+    {
+      "id": "ESHF-LIN-0012",
+      "title": "Full ASLR is enabled",
+      "category": "kernel",
+      "severity": "high",
+      "type": "sysctl",
+      "params": { "key": "kernel.randomize_va_space", "operator": "eq", "expected": 2 },
+      "remediation": { "type": "sysctl", "key": "kernel.randomize_va_space", "value": 2,
+                       "description": "Set kernel.randomize_va_space=2" }
+    },
+    {
+      "id": "ESHF-LIN-0013",
+      "title": "IPv4 forwarding is disabled (non-router endpoints)",
+      "category": "network",
+      "severity": "medium",
+      "type": "sysctl",
+      "params": { "key": "net.ipv4.ip_forward", "operator": "eq", "expected": 0 },
+      "remediation": { "type": "sysctl", "key": "net.ipv4.ip_forward", "value": 0,
+                       "description": "Set net.ipv4.ip_forward=0 (skip if this host routes)" }
+    },
+    {
+      "id": "ESHF-LIN-0014",
+      "title": "ICMP redirects are not accepted",
+      "category": "network",
+      "severity": "medium",
+      "type": "sysctl",
+      "params": { "key": "net.ipv4.conf.all.accept_redirects", "operator": "eq", "expected": 0 },
+      "remediation": { "type": "sysctl", "key": "net.ipv4.conf.all.accept_redirects", "value": 0,
+                       "description": "Set net.ipv4.conf.all.accept_redirects=0" }
+    },
+    {
+      "id": "ESHF-LIN-0015",
+      "title": "Application control (fapolicyd) is active",
+      "category": "application-control",
+      "severity": "high",
+      "type": "app_control_status",
+      "params": {},
+      "remediation": { "type": "command", "cmd": "systemctl enable --now fapolicyd",
+                       "description": "Install fapolicyd, deploy generated rules, enable it" }
+    }
+  ]
+}

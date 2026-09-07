@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "eshf"
+version = "1.1.0"
+description = "Endpoint Security Hardening Framework — baselines, app control, remediation (macOS/Linux/Windows)"
+requires-python = ">=3.8"
+
+[project.scripts]
+eshf = "eshf.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["eshf*"]
